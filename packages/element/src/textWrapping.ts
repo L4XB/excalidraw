@@ -628,7 +628,13 @@ const wrapWord = (
   for (const char of chars) {
     const charStart = offset;
     const charEnd = charStart + char.length;
-    const _charWidth = charWidth.calculate(char, font, env);
+    // The width cache is keyed by the first code unit, so a cluster such as "कि"
+    // would share an entry with "क"; measure clusters of several code points directly.
+    const isCluster =
+      char.length > String.fromCodePoint(char.codePointAt(0)!).length;
+    const _charWidth = isCluster
+      ? getLineWidth(char, font, env)
+      : charWidth.calculate(char, font, env);
     const testLineWidth = currentLineWidth + _charWidth;
 
     if (testLineWidth <= maxWidth) {

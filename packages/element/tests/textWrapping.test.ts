@@ -1,3 +1,4 @@
+import { charWidth } from "../src/textMeasurements";
 import {
   getWrappedTextLines,
   parseTokens,
@@ -38,6 +39,12 @@ describe("Test wrapText", () => {
     // the vowel and tone marks after each consonant belong to it
     expect(wrapText("ที่นี่", font, 20)).toBe("ที่\nนี่");
     // Devanagari vowel signs follow their consonant
+    expect(wrapText("किताब", font, 30)).toBe("कि\nताब");
+  });
+
+  it("measures a cluster as a whole when its first letter's width is cached", () => {
+    // the width cache is keyed by the first code unit, which "क" and "कि" share
+    charWidth.calculate("क", font);
     expect(wrapText("किताब", font, 30)).toBe("कि\nताब");
   });
 
