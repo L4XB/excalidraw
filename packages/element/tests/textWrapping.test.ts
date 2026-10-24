@@ -33,6 +33,14 @@ describe("Test wrapText", () => {
     expect(res).toBe("H\ne\nl\nl\no\n😀");
   });
 
+  it("should not separate combining marks from their letter when breaking a word", () => {
+    // Thai has no spaces between words, so a long run is broken by character;
+    // the vowel and tone marks after each consonant belong to it
+    expect(wrapText("ที่นี่", font, 20)).toBe("ที่\nนี่");
+    // Devanagari vowel signs follow their consonant
+    expect(wrapText("किताब", font, 30)).toBe("कि\nताब");
+  });
+
   it("should not wrap number when wrapping line", () => {
     const text = "don't wrap this number 99,100.99";
     const maxWidth = 300;

@@ -56,6 +56,22 @@ const getEmojiRegex = () => {
   return cachedEmojiRegex;
 };
 
+const graphemeSegmenter =
+  typeof Intl !== "undefined" && typeof Intl.Segmenter === "function"
+    ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
+    : null;
+
+/**
+ * Splits text into user-perceived characters, so that a combining mark
+ * (e.g. a Thai vowel or tone mark) stays with the letter it belongs to.
+ *
+ * Falls back to code points where `Intl.Segmenter` is not available.
+ */
+const splitGraphemes = (text: string): string[] =>
+  graphemeSegmenter
+    ? Array.from(graphemeSegmenter.segment(text), ({ segment }) => segment)
+    : Array.from(text);
+
 /**
  * Common symbols used across different languages.
  */
@@ -601,7 +617,7 @@ const wrapWord = (
   satisfiesWordInvariant(word);
 
   const lines: WrappedTextLine[] = [];
-  const chars = Array.from(word);
+  const chars = splitGraphemes(word);
 
   let currentLine = "";
   let currentLineStart = wordStart;
